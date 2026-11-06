@@ -1,0 +1,3 @@
+- insert:
+    - id: pomodoro-box
+      name: '@local/dsh-pomodoro-box'
