@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0
+
+- 发布到 npm：包名从 `@local/dsh-pomodoro-box` 改为 `dsh-pomodoro-box`，去掉 `private`，加 `publishConfig.access: public`。
+- 新增 `engines.dsh: ">=0.2.1-rc.2 <0.3.0-0"`，符合插件市场索引对每个版本强制声明兼容范围的规则。
+- `client.js` 的 `__ModuleLoader__.load({ id })`、`cordis.patch.yml` 的 bundle 名同步改为新包名。
+- README 补充 npm 安装方式：`dsh plugin --profile web add dsh-pomodoro-box`。
+
 ## 1.1.0
 
 - 新增设置面板里的 5×3 收集图鉴：已收集物品按稀有度着色，点击查看名称、稀有度和描述，未发现物品显示锁定状态。

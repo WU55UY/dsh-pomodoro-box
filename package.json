@@ -1,13 +1,13 @@
 {
-  "name": "@local/dsh-pomodoro-box",
-  "version": "1.1.0",
-  "private": true,
+  "name": "dsh-pomodoro-box",
+  "version": "1.2.0",
   "description": "A pomodoro timer for the DeepSeek Harness composer dock that opens a collectible blind box after every focus session.",
   "type": "module",
   "license": "MIT",
   "keywords": [
     "deepseek-harness",
     "dsh-plugin",
+    "dsh-bundle",
     "pomodoro",
     "blind-box",
     "productivity"
@@ -20,6 +20,12 @@
   "homepage": "https://github.com/WU55UY/dsh-pomodoro-box#readme",
   "bugs": {
     "url": "https://github.com/WU55UY/dsh-pomodoro-box/issues"
+  },
+  "engines": {
+    "dsh": ">=0.2.1-rc.2 <0.3.0-0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "exports": {
     ".": "./index.js",

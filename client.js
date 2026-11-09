@@ -9,7 +9,7 @@
  */
 
 window.__ModuleLoader__.load({
-  id: '@local/dsh-pomodoro-box',
+  id: 'dsh-pomodoro-box',
   factory(require) {
     'use strict';
 

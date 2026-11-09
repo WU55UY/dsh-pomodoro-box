@@ -19,22 +19,30 @@
 
 ## 安装
 
-需要已安装 DeepSeek Harness（Web UI）。先把本仓库克隆或下载到本地一个固定目录：
+需要 DeepSeek Harness 的 0.2.x 版本，最低 `0.2.1-rc.2`（`engines.dsh` 声明为 `>=0.2.1-rc.2 <0.3.0-0`；上界写成 `-0` 是为了在 `includePrerelease` 语义下把 `0.3.0` 的预发布版也挡在外面）。
+
+**从 npm 安装（推荐）**
+
+```bash
+dsh plugin --profile web add dsh-pomodoro-box
+```
+
+`web` 换成你实际使用的 profile 名（桌面端通常是 `desktop`）。装完重启一次 Harness。
+
+**从源码安装**
 
 ```bash
 git clone https://github.com/WU55UY/dsh-pomodoro-box.git
 ```
-
-然后：
 
 1. 打开 Harness 的 **设置 → 插件**，选择安装 Bundle / Install bundle。
 2. 目标选择刚克隆下来的 `dsh-pomodoro-box` 文件夹（绝对路径）。
 3. 在插件列表里启用 **Pomodoro Blind Box**。
 4. 输入框下方出现 `🍅 番茄钟 25:00 专注` 一栏即可使用；如果没出现，刷新一次页面。
 
-这是一个本地 Bundle：`package.json` 里的 `dsh.bundle.patch` 把插件行插入当前 profile，`dsh.client` 把 `client.js` 作为 Web Client module 下发。包名保持为 `@local/dsh-pomodoro-box`，不需要发布到 npm。
+这是一个标准 Bundle：`package.json` 里的 `dsh.bundle.patch` 把插件行插入当前 profile，`dsh.client` 把 `client.js` 作为 Web Client module 下发。包名与 `client.js` 里的 `__ModuleLoader__.load({ id })` 必须一致，都是 `dsh-pomodoro-box`。
 
-> 需要支持 Client module 的 DSH 版本；插件注册在 `conversation.composer.dock` 和 `shell.overlay` 两个 Slot 上。
+> 插件注册在 `conversation.composer.dock` 和 `shell.overlay` 两个 Slot 上。
 
 ## 使用
 
@@ -106,7 +114,7 @@ pomodoro-box/
 
 几个容易踩的点：
 
-- `client.js` 必须调用 `window.__ModuleLoader__.load({ id: '@local/dsh-pomodoro-box', factory })`，`id` 与包名一致；React 从共享模块表 `require('react')` 取，不写 JSX/TypeScript。
+- `client.js` 必须调用 `window.__ModuleLoader__.load({ id: 'dsh-pomodoro-box', factory })`，`id` 与包名一致；React 从共享模块表 `require('react')` 取，不写 JSX/TypeScript。
 - `client.js` 里的 `EN` / `ZH` 是运行时词典；`locale/*.json` 是 Host 在插件列表里读取的元数据和同一份词典。**两边要同步改**。
 - 修改 `client.js` 后，在插件管理里**禁用再启用**该插件即可让页面拿到新代码；如果 HMR 正在运行也可能自动生效。
 - 主题只用 `--dsw-alias-*` token 和插件私有的 `--dsh-pomo-*` 变量；新增颜色请先确认 token 存在。
