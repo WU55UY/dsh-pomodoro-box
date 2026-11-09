@@ -57,11 +57,11 @@
       "versions": [
         {
           "version": "1.2.0",
-          "publishTimestamp": 1762670000,
+          "publishTimestamp": 1794209315,
           "source": {
             "type": "git",
             "url": "https://github.com/WU55UY/dsh-pomodoro-box",
-            "commit": "75455a7a3c3b4db8a5b0538cfa19b8645ddc932d"
+            "commit": "2b4a2c4da1f1309f9d040ff659a94fefcc4da87d"
           },
           "engines": {
             "dsh": ">=0.2.1-rc.2 <0.3.0-0"
