@@ -52,16 +52,16 @@
         ]
       },
       "dist-tags": {
-        "latest": "1.2.0"
+        "latest": "1.2.1"
       },
       "versions": [
         {
-          "version": "1.2.0",
-          "publishTimestamp": 1794209315,
+          "version": "1.2.1",
+          "publishTimestamp": 1794209573,
           "source": {
             "type": "git",
             "url": "https://github.com/WU55UY/dsh-pomodoro-box",
-            "commit": "2b4a2c4da1f1309f9d040ff659a94fefcc4da87d"
+            "commit": "eb7f372456fd59606be4ff5f8176ec66ea98ae49"
           },
           "engines": {
             "dsh": ">=0.2.1-rc.2 <0.3.0-0"
