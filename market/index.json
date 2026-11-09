@@ -1,0 +1,73 @@
+{
+  "format": 1,
+  "title": {
+    "en": "WU55UY DSH Plugins",
+    "zh": "WU55UY 的 DSH 插件"
+  },
+  "description": {
+    "en": "Bundles for DeepSeek Harness maintained by WU55UY.",
+    "zh": "WU55UY 维护的 DeepSeek Harness 插件。"
+  },
+  "metadata": {
+    "categories": {
+      "ui": {
+        "title": {
+          "en": "UI Enhancements",
+          "zh": "UI 增强"
+        }
+      },
+      "fun": {
+        "title": {
+          "en": "Just for Fun",
+          "zh": "娱乐"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-pomodoro-box",
+      "title": {
+        "en": "Pomodoro Blind Box",
+        "zh": "番茄钟盲盒"
+      },
+      "description": {
+        "en": "A pomodoro timer in the composer dock that opens a collectible blind box after every finished focus session, with a 15-item gallery and four rarity tiers.",
+        "zh": "挂在输入框下方的番茄钟，每完成一个专注段就开一个盲盒，带 15 件藏品图鉴和四档稀有度。"
+      },
+      "icon": "icons/pomodoro.svg",
+      "author": "WU55UY",
+      "homepage": "https://github.com/WU55UY/dsh-pomodoro-box#readme",
+      "repository": {
+        "url": "https://github.com/WU55UY/dsh-pomodoro-box"
+      },
+      "metadata": {
+        "category": "ui",
+        "keywords": [
+          "pomodoro",
+          "timer",
+          "focus",
+          "blind-box",
+          "productivity"
+        ]
+      },
+      "dist-tags": {
+        "latest": "1.2.0"
+      },
+      "versions": [
+        {
+          "version": "1.2.0",
+          "publishTimestamp": 1762670000,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/WU55UY/dsh-pomodoro-box",
+            "commit": "75455a7a3c3b4db8a5b0538cfa19b8645ddc932d"
+          },
+          "engines": {
+            "dsh": ">=0.2.1-rc.2 <0.3.0-0"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -44,6 +44,20 @@ git clone https://github.com/WU55UY/dsh-pomodoro-box.git
 
 > 插件注册在 `conversation.composer.dock` 和 `shell.overlay` 两个 Slot 上。
 
+## 插件市场
+
+本仓库自带一个 format-1 插件索引，可以直接加进 Harness：**插件 → 发现 → 添加索引源**，填
+
+```
+https://cdn.jsdelivr.net/gh/WU55UY/dsh-pomodoro-box@main/market/index.json
+```
+
+索引由 [`market/build-index.mjs`](market/build-index.mjs) 生成，条目里的 `source` 钉在具体提交上，所以市场里装到的和仓库里那一版完全一致。改完索引后建议用官方校验器自检：
+
+```bash
+node -e "import('@deepseek-ai/dsh-plugin-market-index').then(m => console.log(m.parseMarketIndex(JSON.parse(require('fs').readFileSync('market/index.json','utf8')), 'https://example.com/index.json').plugins.length + ' plugin(s) OK'))"
+```
+
 ## 使用
 
 | 操作 | 说明 |
