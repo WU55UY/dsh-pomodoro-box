@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2
+
+- 发布到 npm：从这一版起可以直接 `dsh plugin --profile <name> add dsh-pomodoro-box`，也可以 `tarball` / `git+…#v1.2.2` 安装。
+- README 安装章节改为 npm 优先，tarball、git tag、插件索引、本地目录作为备选路径。
+- 插件索引的 `source` 从「git 钉提交」切换为 `npm`，市场里装到的与 npm 上的一致。
+
 ## 1.2.1
 
 - README 删掉「从 npm 安装」：这个包**还没有发布到 npm**，指向不存在包的命令只会 404；改为预打包 tarball、git 钉提交、插件索引、本地目录四条实测可用的路径。

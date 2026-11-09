@@ -21,27 +21,31 @@
 
 需要 DeepSeek Harness 的 0.2.x 版本，最低 `0.2.1-rc.2`（`engines.dsh` 声明为 `>=0.2.1-rc.2 <0.3.0-0`；上界写成 `-0` 是为了在 `includePrerelease` 语义下把 `0.3.0` 的预发布版也挡在外面）。
 
-> 这个包**目前不在 npm 上**（npmjs 要求发布方启用 2FA，账号暂未满足），所以没有 `dsh plugin add dsh-pomodoro-box` 这一行。下面四条都是可用路径。
-
-**A. 预打包 tarball（推荐，22 KB，最快）**
+**A. 从 npm 安装（推荐）**
 
 ```bash
-dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.1/dsh-pomodoro-box-1.2.1.tgz
+dsh plugin --profile desktop add dsh-pomodoro-box
 ```
 
-`desktop` 换成你实际的 profile 名（Web 版通常是 `web`）。这条命令既安装包，也会把 `dsh-pomodoro-box` 加进该 profile 的 `dsh.profile.bundles`，重启一次 Harness 生效。
-
-**B. 钉在提交上的 git 源**
+**B. 预打包 tarball（不经过 npm，23 KB）**
 
 ```bash
-dsh plugin --profile desktop add "git+https://github.com/WU55UY/dsh-pomodoro-box.git#d8d18e293834c86f5e4298977309f5fc9e064761"
+dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.2/dsh-pomodoro-box-1.2.2.tgz
 ```
 
-**C. 插件市场**
+`desktop` 换成你实际使用的 profile 名（Web 版通常是 `web`）。这两种方式都会把 `dsh-pomodoro-box` 写进该 profile 的 `dsh.profile.bundles`，重启一次 Harness 生效。
+
+**C. 钉在 tag 上的 git 源**
+
+```bash
+dsh plugin --profile desktop add "git+https://github.com/WU55UY/dsh-pomodoro-box.git#v1.2.2"
+```
+
+**D. 插件市场**
 
 加下面「插件市场」一节的索引源，然后在 **插件 → 发现** 里点安装。
 
-**D. 从本地目录安装**
+**E. 从本地目录安装**
 
 1. `git clone https://github.com/WU55UY/dsh-pomodoro-box.git`
 2. 打开 Harness 的 **设置 → 插件**，选择安装 Bundle / Install bundle。
@@ -153,7 +157,7 @@ pomodoro-box/
 
 Pomodoro Blind Box is a DeepSeek Harness Web UI plugin that puts a focus timer under the composer. Every completed focus session opens one blind box; there are 15 collectible items across 4 rarities (60% / 25% / 12% / 3%), and a 5×3 collection gallery in the settings panel. Skipping a session never grants a box.
 
-- **Install**: not on npm yet (npmjs requires publisher 2FA). Fastest path is the prebuilt tarball: `dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.1/dsh-pomodoro-box-1.2.1.tgz`; alternatively add the market index below, pin the git source to a commit, or install the cloned folder as a bundle in Harness (Settings → Plugins → Install bundle).
+- **Install**: `dsh plugin --profile desktop add dsh-pomodoro-box` (npm), or attach the prebuilt tarball from the latest GitHub release if you would rather not go through npm; the market index below and installing the cloned folder as a bundle both work too.
 - **Data**: everything lives in `localStorage` under `dsh.pomodoro-box.v1`; the plugin makes no network requests.
 - **Dev**: no build step. `client.js` is loaded as a Client module via `window.__ModuleLoader__`; keep the runtime `EN`/`ZH` dictionaries in sync with `locale/*.json`.
 
