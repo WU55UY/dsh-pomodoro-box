@@ -26,7 +26,7 @@
 **A. 预打包 tarball（推荐，22 KB，最快）**
 
 ```bash
-dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.0/dsh-pomodoro-box-1.2.0.tgz
+dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.1/dsh-pomodoro-box-1.2.1.tgz
 ```
 
 `desktop` 换成你实际的 profile 名（Web 版通常是 `web`）。这条命令既安装包，也会把 `dsh-pomodoro-box` 加进该 profile 的 `dsh.profile.bundles`，重启一次 Harness 生效。
@@ -34,7 +34,7 @@ dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/rele
 **B. 钉在提交上的 git 源**
 
 ```bash
-dsh plugin --profile desktop add "git+https://github.com/WU55UY/dsh-pomodoro-box.git#75455a7a3c3b4db8a5b0538cfa19b8645ddc932d"
+dsh plugin --profile desktop add "git+https://github.com/WU55UY/dsh-pomodoro-box.git#d8d18e293834c86f5e4298977309f5fc9e064761"
 ```
 
 **C. 插件市场**
@@ -153,7 +153,7 @@ pomodoro-box/
 
 Pomodoro Blind Box is a DeepSeek Harness Web UI plugin that puts a focus timer under the composer. Every completed focus session opens one blind box; there are 15 collectible items across 4 rarities (60% / 25% / 12% / 3%), and a 5×3 collection gallery in the settings panel. Skipping a session never grants a box.
 
-- **Install**: not on npm yet (npmjs requires publisher 2FA). Fastest path is the prebuilt tarball: `dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.0/dsh-pomodoro-box-1.2.0.tgz`; alternatively add the market index below, pin the git source to a commit, or install the cloned folder as a bundle in Harness (Settings → Plugins → Install bundle).
+- **Install**: not on npm yet (npmjs requires publisher 2FA). Fastest path is the prebuilt tarball: `dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.1/dsh-pomodoro-box-1.2.1.tgz`; alternatively add the market index below, pin the git source to a commit, or install the cloned folder as a bundle in Harness (Settings → Plugins → Install bundle).
 - **Data**: everything lives in `localStorage` under `dsh.pomodoro-box.v1`; the plugin makes no network requests.
 - **Dev**: no build step. `client.js` is loaded as a Client module via `window.__ModuleLoader__`; keep the runtime `EN`/`ZH` dictionaries in sync with `locale/*.json`.
 
