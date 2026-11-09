@@ -21,24 +21,33 @@
 
 需要 DeepSeek Harness 的 0.2.x 版本，最低 `0.2.1-rc.2`（`engines.dsh` 声明为 `>=0.2.1-rc.2 <0.3.0-0`；上界写成 `-0` 是为了在 `includePrerelease` 语义下把 `0.3.0` 的预发布版也挡在外面）。
 
-**从 npm 安装（推荐）**
+> 这个包**目前不在 npm 上**（npmjs 要求发布方启用 2FA，账号暂未满足），所以没有 `dsh plugin add dsh-pomodoro-box` 这一行。下面四条都是可用路径。
+
+**A. 预打包 tarball（推荐，22 KB，最快）**
 
 ```bash
-dsh plugin --profile web add dsh-pomodoro-box
+dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.0/dsh-pomodoro-box-1.2.0.tgz
 ```
 
-`web` 换成你实际使用的 profile 名（桌面端通常是 `desktop`）。装完重启一次 Harness。
+`desktop` 换成你实际的 profile 名（Web 版通常是 `web`）。这条命令既安装包，也会把 `dsh-pomodoro-box` 加进该 profile 的 `dsh.profile.bundles`，重启一次 Harness 生效。
 
-**从源码安装**
+**B. 钉在提交上的 git 源**
 
 ```bash
-git clone https://github.com/WU55UY/dsh-pomodoro-box.git
+dsh plugin --profile desktop add "git+https://github.com/WU55UY/dsh-pomodoro-box.git#75455a7a3c3b4db8a5b0538cfa19b8645ddc932d"
 ```
 
-1. 打开 Harness 的 **设置 → 插件**，选择安装 Bundle / Install bundle。
-2. 目标选择刚克隆下来的 `dsh-pomodoro-box` 文件夹（绝对路径）。
-3. 在插件列表里启用 **Pomodoro Blind Box**。
-4. 输入框下方出现 `🍅 番茄钟 25:00 专注` 一栏即可使用；如果没出现，刷新一次页面。
+**C. 插件市场**
+
+加下面「插件市场」一节的索引源，然后在 **插件 → 发现** 里点安装。
+
+**D. 从本地目录安装**
+
+1. `git clone https://github.com/WU55UY/dsh-pomodoro-box.git`
+2. 打开 Harness 的 **设置 → 插件**，选择安装 Bundle / Install bundle。
+3. 目标选择克隆下来的 `dsh-pomodoro-box` 文件夹（绝对路径）。
+4. 在插件列表里启用 **Pomodoro Blind Box**。
+5. 输入框下方出现 `🍅 番茄钟 25:00 专注` 一栏即可使用；如果没出现，刷新一次页面。
 
 这是一个标准 Bundle：`package.json` 里的 `dsh.bundle.patch` 把插件行插入当前 profile，`dsh.client` 把 `client.js` 作为 Web Client module 下发。包名与 `client.js` 里的 `__ModuleLoader__.load({ id })` 必须一致，都是 `dsh-pomodoro-box`。
 
@@ -52,7 +61,13 @@ git clone https://github.com/WU55UY/dsh-pomodoro-box.git
 https://cdn.jsdelivr.net/gh/WU55UY/dsh-pomodoro-box@main/market/index.json
 ```
 
-索引由 [`market/build-index.mjs`](market/build-index.mjs) 生成，条目里的 `source` 钉在具体提交上，所以市场里装到的和仓库里那一版完全一致。改完索引后建议用官方校验器自检：
+索引由 [`market/build-index.mjs`](market/build-index.mjs) 生成，条目里的 `source` 钉在具体提交上，所以市场里装到的和仓库里那一版完全一致。
+
+> jsDelivr 会缓存分支引用（`@main`），索引改动最长可能 12 小时后才生效；要立刻生效或想要不可变 URL，把 `@main` 换成具体提交哈希即可。
+>
+> format-1 的 `source` 只支持 `npm` 和 `git` 两种，**没有 tarball 类型**，所以索引里走「git + 钉提交」，22 KB 的 tarball 快路径放在 awesome-dsh-plugin 的条目里。
+
+改完索引后建议用官方校验器自检：
 
 ```bash
 node -e "import('@deepseek-ai/dsh-plugin-market-index').then(m => console.log(m.parseMarketIndex(JSON.parse(require('fs').readFileSync('market/index.json','utf8')), 'https://example.com/index.json').plugins.length + ' plugin(s) OK'))"
@@ -138,7 +153,7 @@ pomodoro-box/
 
 Pomodoro Blind Box is a DeepSeek Harness Web UI plugin that puts a focus timer under the composer. Every completed focus session opens one blind box; there are 15 collectible items across 4 rarities (60% / 25% / 12% / 3%), and a 5×3 collection gallery in the settings panel. Skipping a session never grants a box.
 
-- **Install**: clone the repo, then install the folder as a bundle in Harness (Settings → Plugins → Install bundle) and enable *Pomodoro Blind Box*.
+- **Install**: not on npm yet (npmjs requires publisher 2FA). Fastest path is the prebuilt tarball: `dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.0/dsh-pomodoro-box-1.2.0.tgz`; alternatively add the market index below, pin the git source to a commit, or install the cloned folder as a bundle in Harness (Settings → Plugins → Install bundle).
 - **Data**: everything lives in `localStorage` under `dsh.pomodoro-box.v1`; the plugin makes no network requests.
 - **Dev**: no build step. `client.js` is loaded as a Client module via `window.__ModuleLoader__`; keep the runtime `EN`/`ZH` dictionaries in sync with `locale/*.json`.
 
