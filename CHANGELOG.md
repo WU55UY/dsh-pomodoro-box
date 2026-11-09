@@ -1,11 +1,17 @@
 # Changelog
 
+## 1.2.1
+
+- README 删掉「从 npm 安装」：这个包**还没有发布到 npm**，指向不存在包的命令只会 404；改为预打包 tarball、git 钉提交、插件索引、本地目录四条实测可用的路径。
+- `CHANGELOG` 里 1.2.0 关于「发布到 npm」的措辞改成「为发布 npm 做准备」；`publishConfig` 仍在，等账号满足 npm 的 2FA 要求才发。
+- 插件索引的 `publishTimestamp` 修正为当前时间（原值 `1762670000` 是 2025-11-09，比实际早一年，按时间排序的市场会把它埋到底部）。
+
 ## 1.2.0
 
-- 发布到 npm：包名从 `@local/dsh-pomodoro-box` 改为 `dsh-pomodoro-box`，去掉 `private`，加 `publishConfig.access: public`。
+- 为发布 npm 做准备：包名从 `@local/dsh-pomodoro-box` 改为 `dsh-pomodoro-box`，去掉 `private`，加 `publishConfig.access: public`（尚未实际发布）。
 - 新增 `engines.dsh: ">=0.2.1-rc.2 <0.3.0-0"`，符合插件市场索引对每个版本强制声明兼容范围的规则。
 - `client.js` 的 `__ModuleLoader__.load({ id })`、`cordis.patch.yml` 的 bundle 名同步改为新包名。
-- README 补充 npm 安装方式：`dsh plugin --profile web add dsh-pomodoro-box`。
+- `locale/*.json` 与 README 里的包名、标题同步更新。
 
 ## 1.1.0
 
