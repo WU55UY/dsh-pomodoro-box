@@ -454,16 +454,22 @@ def main() -> int:
     dock.save(dock_path)
     print("wrote %s (%dx%d)" % (dock_path, dock.width, dock.height))
 
-    # One shared palette avoids colour flicker, but sampling it from a single
-    # frame at 128 colours dropped rare accents: the blue gem went grey while
-    # the gold star survived. Sample a montage of every frame at 256 colours.
+    # One shared palette avoids colour flicker. Small vivid artwork is easy
+    # for MEDIANCUT to discard: a plain 256-colour montage still mapped the
+    # whole gem to one dull grey-blue (152,183,209). Give the emoji region
+    # 3x weight and use FASTOCTREE, which keeps small saturated clusters.
+    w, h = frames[0].size
+    accent_box = (round(w * 230 / 544), round(h * 110 / 448),
+                  round(w * 320 / 544), round(h * 200 / 448))
+    accents = [f.crop(accent_box) for f in frames]
+    samples = list(frames) + accents * 3
     thumb_w, thumb_h, cols = 128, 105, 6
-    rows = (len(frames) + cols - 1) // cols
+    rows = (len(samples) + cols - 1) // cols
     montage = Image.new("RGB", (thumb_w * cols, thumb_h * rows))
-    for k, frame in enumerate(frames):
-        montage.paste(frame.resize((thumb_w, thumb_h), Image.LANCZOS),
+    for k, sample in enumerate(samples):
+        montage.paste(sample.resize((thumb_w, thumb_h), Image.LANCZOS),
                       ((k % cols) * thumb_w, (k // cols) * thumb_h))
-    palette = montage.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
+    palette = montage.quantize(colors=256, method=Image.Quantize.FASTOCTREE)
     quant = [f.quantize(palette=palette, dither=Image.Dither.NONE) for f in frames]
     durations = [args.step] * len(quant)
     durations[-1] = 1000

@@ -5,7 +5,7 @@
 - 修复开箱卡片的高度跳变：`client.js` 把「盲盒正在打开…」和结果区放进同一个 grid 单元（`.dshPomo_reveal`），两态只切换 `visibility` / `opacity`，卡片从挂载起高度恒定；`prefers-reduced-motion` 下过渡也归零。
 - 理顺开箱时序：去掉 `dshPomoVanish` / `dshPomoLid` 的 0.58s 延迟和 `dshPomoItem` 的 0.68s 延迟，火花延迟从 0.72s 降到 0.06s。切到结果时礼盒立刻开盖、藏品立刻弹出，不再有「结果文字已出现、礼盒又摇一次」的空档。
 - README 动图回到浅色主题（`body[data-ds-light-theme]`），保留三段分镜构图；深色版宝石与礼盒对比过强、整体发闷。
-- `tools/render-preview.py`：GIF 调色板由「单帧 128 色」改为「全部帧拼图采样 256 色」，修复 💎 的蓝色被量化成灰白；浏览器 profile 改为按 worker 线程复用系统临时目录，工作区只保留 PNG，并支持 `--reassemble` 用已有帧重调色板。构建产物 `build/` 已加入 `.gitignore`。
+- `tools/render-preview.py`：GIF 调色板最终定为「全帧 + 藏品区域 3× 加权采样，FASTOCTREE 256 色」。此前 MEDIANCUT 会把 💎 整块压成单一灰蓝 `(152,183,209)`，现在保留 60+ 级蓝色渐变（`(103,185,250)` ~ `(151,216,252)`），体积反而从 554 KiB 降到 441 KiB。浏览器 profile 改为按 worker 线程复用系统临时目录，工作区只保留 PNG，并支持 `--reassemble` 用已有帧重调色板。构建产物 `build/` 已加入 `.gitignore`。
 
 ## 1.2.2
 
