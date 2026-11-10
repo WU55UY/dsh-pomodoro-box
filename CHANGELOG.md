@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.4
+
+- README 的两张图片从仓库相对路径改为 jsDelivr CDN 绝对地址（钉 `@main`）：相对路径最终落到 `raw.githubusercontent.com`，在部分网络下不可达，GitHub 与 npm 页面都会出现图裂；CDN 地址两边都能直接加载。
+- 纯文档改动，`client.js` 与插件行为不变；同步 npm / GitHub Release / 插件市场索引到 1.2.4。
+
 ## 1.2.3
 
 - 发布到 npm 与 GitHub Release `v1.2.3`；README 的 tarball / git tag 安装示例、插件市场索引同步到 1.2.3。

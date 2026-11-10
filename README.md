@@ -7,9 +7,9 @@
 ![MIT](https://img.shields.io/badge/license-MIT-green)
 ![DSH](https://img.shields.io/badge/DeepSeek%20Harness-Web%20UI-blue)
 
-![浅色主题演示：输入框下方的番茄钟 → 连开两个盲盒（史诗 / 传说）→ 图鉴点亮](docs/preview.gif)
+![浅色主题演示：输入框下方的番茄钟 → 连开两个盲盒（史诗 / 传说）→ 图鉴点亮](https://cdn.jsdelivr.net/gh/WU55UY/dsh-pomodoro-box@main/docs/preview.gif)
 
-> 上面不是示意图：[`tools/render-preview.py`](tools/render-preview.py) 直接执行本仓库的 `client.js`，渲染真实的 `PomodoroDock` / `PomodoroBox` / `CollectionGrid` 组件，用真实 CSS keyframes、真实中文词典和 Harness 浅色主题 token 逐帧截图合成。三段分镜：计时 → 连开两个不同稀有度的盲盒 → 图鉴点亮刚开出的两件藏品。
+> 上面不是示意图：[`tools/render-preview.py`](tools/render-preview.py) 直接执行本仓库的 `client.js`，渲染真实的 `PomodoroDock` / `PomodoroBox` / `CollectionGrid` 组件，用真实 CSS keyframes、真实中文词典和 Harness 浅色主题 token 逐帧截图合成。三段分镜：计时 → 连开两个不同稀有度的盲盒 → 图鉴点亮刚开出的两件藏品。图片走 jsDelivr CDN，避免 `raw.githubusercontent.com` 在部分网络下不可达导致 README 里的图裂。
 
 ## 功能
 
@@ -34,7 +34,7 @@ dsh plugin --profile desktop add dsh-pomodoro-box
 **B. 预打包 tarball（不经过 npm，25 KB）**
 
 ```bash
-dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.3/dsh-pomodoro-box-1.2.3.tgz
+dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.4/dsh-pomodoro-box-1.2.4.tgz
 ```
 
 `desktop` 换成你实际使用的 profile 名（Web 版通常是 `web`）。这两种方式都会把 `dsh-pomodoro-box` 写进该 profile 的 `dsh.profile.bundles`，重启一次 Harness 生效。
@@ -42,7 +42,7 @@ dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/rele
 **C. 钉在 tag 上的 git 源**
 
 ```bash
-dsh plugin --profile desktop add "git+https://github.com/WU55UY/dsh-pomodoro-box.git#v1.2.3"
+dsh plugin --profile desktop add "git+https://github.com/WU55UY/dsh-pomodoro-box.git#v1.2.4"
 ```
 
 **D. 插件市场**
@@ -59,7 +59,7 @@ dsh plugin --profile desktop add "git+https://github.com/WU55UY/dsh-pomodoro-box
 
 装好之后，输入框下方长这样（同样是真实组件渲染，不是画的）：
 
-![输入框下方的番茄钟栏](docs/dock.png)
+![输入框下方的番茄钟栏](https://cdn.jsdelivr.net/gh/WU55UY/dsh-pomodoro-box@main/docs/dock.png)
 
 这是一个标准 Bundle：`package.json` 里的 `dsh.bundle.patch` 把插件行插入当前 profile，`dsh.client` 把 `client.js` 作为 Web Client module 下发。包名与 `client.js` 里的 `__ModuleLoader__.load({ id })` 必须一致，都是 `dsh-pomodoro-box`。
 
