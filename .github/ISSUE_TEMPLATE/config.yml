@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Usage question
+    url: https://github.com/WU55UY/dsh-pomodoro-box/discussions
+    about: Ask how to install, configure, or use the plugin here.

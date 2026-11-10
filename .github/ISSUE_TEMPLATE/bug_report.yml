@@ -1,0 +1,52 @@
+name: Bug report
+about: Something in the timer, blind box, or gallery is broken
+title: "[Bug] "
+labels: bug
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting. Please fill in the environment block — most issues are profile-specific.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Install with `dsh plugin --profile desktop add dsh-pomodoro-box`
+        2. Start a 15-minute focus session
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: harness
+    attributes:
+      label: Harness version
+      placeholder: "0.2.2-rc.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: profile
+    attributes:
+      label: Profile
+      options:
+        - desktop
+        - web
+        - custom / other
+    validations:
+      required: true
+  - type: input
+    id: pluginversion
+    attributes:
+      label: Plugin version
+      placeholder: "1.2.4"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console output / screenshots
+      description: Paste any errors from DevTools. No conversation content is needed.

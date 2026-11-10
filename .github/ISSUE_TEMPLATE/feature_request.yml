@@ -1,0 +1,25 @@
+name: Feature request
+about: Suggest a new collectible, timer option, or gallery behaviour
+title: "[Feature] "
+labels: enhancement
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it helps
+      description: What are you trying to do that the plugin cannot do today?
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This keeps the plugin local-only (no network requests)
+          required: true
+        - label: This does not require a build step or new runtime dependency
+          required: true

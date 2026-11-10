@@ -4,6 +4,8 @@
 
 一个 [DeepSeek Harness](https://github.com/deepseek-ai) Web UI 插件：纯前端、无依赖、无构建步骤、无网络请求。计时和收集进度只存在浏览器的 `localStorage` 里。
 
+**一行安装**：`dsh plugin --profile desktop add dsh-pomodoro-box` · [npm](https://www.npmjs.com/package/dsh-pomodoro-box) · [其它安装方式](#安装) · 纯前端、无网络请求，数据只在本机。
+
 ![MIT](https://img.shields.io/badge/license-MIT-green)
 ![DSH](https://img.shields.io/badge/DeepSeek%20Harness-Web%20UI-blue)
 
@@ -165,6 +167,8 @@ pomodoro-box/
 - 新增文件时记得加进 `package.json` 的 `files`。
 
 ## English
+
+**One-line install**: `dsh plugin --profile desktop add dsh-pomodoro-box`. Pure front-end, no network calls, data stays on this machine.
 
 Pomodoro Blind Box is a DeepSeek Harness Web UI plugin that puts a focus timer under the composer. Every completed focus session opens one blind box; there are 15 collectible items across 4 rarities (60% / 25% / 12% / 3%), and a 5×3 collection gallery in the settings panel. Skipping a session never grants a box.
 

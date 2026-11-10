@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Added `CONTRIBUTING.md`, structured issue forms and a one-line install command on the first screen.
+- Removed the stale reference to the version-pinned tarball in the awesome list.
 ## 1.2.4
 
 - README 的两张图片从仓库相对路径改为 jsDelivr CDN 绝对地址（钉 `@main`）：相对路径最终落到 `raw.githubusercontent.com`，在部分网络下不可达，GitHub 与 npm 页面都会出现图裂；CDN 地址两边都能直接加载。
