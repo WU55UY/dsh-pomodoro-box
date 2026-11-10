@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- README 补开箱动图与输入框 dock 截图：两张图都由 `tools/render-preview.py` 直接执行 `client.js`，用真实组件、真实 CSS keyframes、真实词典和 Harness 主题 token 渲染，不是手绘示意图。
+- 新增 `tools/render-preview.py`（macOS + Edge + Pillow），动图可复现；构建产物 `build/` 加入 `.gitignore`。
+
 ## 1.2.2
 
 - 发布到 npm：从这一版起可以直接 `dsh plugin --profile <name> add dsh-pomodoro-box`，也可以 `tarball` / `git+…#v1.2.2` 安装。

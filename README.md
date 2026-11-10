@@ -7,6 +7,10 @@
 ![MIT](https://img.shields.io/badge/license-MIT-green)
 ![DSH](https://img.shields.io/badge/DeepSeek%20Harness-Web%20UI-blue)
 
+![开箱动图：盲盒摇晃、开盖，弹出「幸运番茄星」](docs/preview.gif)
+
+> 上面不是示意图：[`tools/render-preview.py`](tools/render-preview.py) 直接执行本仓库的 `client.js`，用真实的开箱组件、真实 CSS 动画、真实中文词典和 Harness 主题 token 逐帧渲染，再合成为 GIF。
+
 ## 功能
 
 - **番茄钟**：专注 15 / 25 / 45 / 60 分钟，短休息与长休息 3 / 5 / 10 / 15 分钟；开始、暂停、继续、跳过、重置。
@@ -52,6 +56,10 @@ dsh plugin --profile desktop add "git+https://github.com/WU55UY/dsh-pomodoro-box
 3. 目标选择克隆下来的 `dsh-pomodoro-box` 文件夹（绝对路径）。
 4. 在插件列表里启用 **Pomodoro Blind Box**。
 5. 输入框下方出现 `🍅 番茄钟 25:00 专注` 一栏即可使用；如果没出现，刷新一次页面。
+
+装好之后，输入框下方长这样（同样是真实组件渲染，不是画的）：
+
+![输入框下方的番茄钟栏](docs/dock.png)
 
 这是一个标准 Bundle：`package.json` 里的 `dsh.bundle.patch` 把插件行插入当前 profile，`dsh.client` 把 `client.js` 作为 Web Client module 下发。包名与 `client.js` 里的 `__ModuleLoader__.load({ id })` 必须一致，都是 `dsh-pomodoro-box`。
 
@@ -142,6 +150,9 @@ pomodoro-box/
 ├── locale/
 │   ├── zh.json         插件列表里的标题/描述 + 词典
 │   └── en.json
+├── docs/               README 用的真实渲染素材（dock.png / preview.gif）
+├── tools/
+│   └── render-preview.py  从 client.js 重新生成上面两张图
 └── icon.svg            插件图标（原创 SVG）
 ```
 
@@ -160,6 +171,7 @@ Pomodoro Blind Box is a DeepSeek Harness Web UI plugin that puts a focus timer u
 - **Install**: `dsh plugin --profile desktop add dsh-pomodoro-box` (npm), or attach the prebuilt tarball from the latest GitHub release if you would rather not go through npm; the market index below and installing the cloned folder as a bundle both work too.
 - **Data**: everything lives in `localStorage` under `dsh.pomodoro-box.v1`; the plugin makes no network requests.
 - **Dev**: no build step. `client.js` is loaded as a Client module via `window.__ModuleLoader__`; keep the runtime `EN`/`ZH` dictionaries in sync with `locale/*.json`.
+- **Preview**: the GIF above is rendered frame-by-frame from the shipped `client.js` by `tools/render-preview.py` — real CSS keyframes, real locale strings, not a mockup.
 
 ## License
 
