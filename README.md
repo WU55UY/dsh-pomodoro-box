@@ -7,9 +7,9 @@
 ![MIT](https://img.shields.io/badge/license-MIT-green)
 ![DSH](https://img.shields.io/badge/DeepSeek%20Harness-Web%20UI-blue)
 
-![开箱动图：盲盒摇晃、开盖，弹出「幸运番茄星」](docs/preview.gif)
+![深色主题演示：输入框下方的番茄钟 → 连开两个盲盒（史诗 / 传说）→ 图鉴点亮](docs/preview.gif)
 
-> 上面不是示意图：[`tools/render-preview.py`](tools/render-preview.py) 直接执行本仓库的 `client.js`，用真实的开箱组件、真实 CSS 动画、真实中文词典和 Harness 主题 token 逐帧渲染，再合成为 GIF。
+> 上面不是示意图：[`tools/render-preview.py`](tools/render-preview.py) 直接执行本仓库的 `client.js`，渲染真实的 `PomodoroDock` / `PomodoroBox` / `CollectionGrid` 组件，用真实 CSS keyframes、真实中文词典和 Harness 深色主题 token 逐帧截图合成。三段分镜：计时 → 连开两个不同稀有度的盲盒 → 图鉴点亮刚开出的两件藏品。
 
 ## 功能
 
@@ -152,7 +152,7 @@ pomodoro-box/
 │   └── en.json
 ├── docs/               README 用的真实渲染素材（dock.png / preview.gif）
 ├── tools/
-│   └── render-preview.py  从 client.js 重新生成上面两张图
+│   └── render-preview.py  三段分镜动图 + dock 截图，均从 client.js 重新渲染
 └── icon.svg            插件图标（原创 SVG）
 ```
 
@@ -171,7 +171,7 @@ Pomodoro Blind Box is a DeepSeek Harness Web UI plugin that puts a focus timer u
 - **Install**: `dsh plugin --profile desktop add dsh-pomodoro-box` (npm), or attach the prebuilt tarball from the latest GitHub release if you would rather not go through npm; the market index below and installing the cloned folder as a bundle both work too.
 - **Data**: everything lives in `localStorage` under `dsh.pomodoro-box.v1`; the plugin makes no network requests.
 - **Dev**: no build step. `client.js` is loaded as a Client module via `window.__ModuleLoader__`; keep the runtime `EN`/`ZH` dictionaries in sync with `locale/*.json`.
-- **Preview**: the GIF above is rendered frame-by-frame from the shipped `client.js` by `tools/render-preview.py` — real CSS keyframes, real locale strings, not a mockup.
+- **Preview**: the GIF above is a three-shot cut rendered frame-by-frame from the shipped `client.js` by `tools/render-preview.py` — the composer dock, two blind boxes (epic / legendary), then the collection gallery lighting up. Real components, real CSS keyframes, real locale strings and dark-theme tokens; not a mockup.
 
 ## License
 

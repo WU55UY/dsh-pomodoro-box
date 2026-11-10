@@ -1,15 +1,24 @@
 #!/usr/bin/env python3
 """Render the README preview GIF from the plugin's real source.
 
-Nothing in the artwork is hand-drawn: the page loads this repository's
-client.js, executes its real factory with a tiny React/DOM shim, and renders
-the real PomodoroBox component with the real CSS, real locale strings, real
-SVG icons and the real Harness theme tokens extracted from app.asar.
-Every frame is a headless-browser screenshot of that DOM at a frozen
-animation time, so the shake / lid / item / spark keyframes are the shipped
-ones.
+Nothing here is hand-drawn. The page loads this repository's client.js,
+executes its real factory with a tiny React/DOM shim, and renders the real
+PomodoroDock, PomodoroBox and CollectionGrid components with the real CSS,
+real locale strings, real SVG icons and the real Harness theme tokens
+extracted from app.asar (light: body[data-ds-light-theme], dark:
+body[data-ds-dark-theme]).
 
-Usage: python3 tools/render-preview.py [--frames N] [--out docs/preview.gif]
+The GIF is a three-shot cut, all from those components:
+
+  1. the composer dock counting down (real ring progress + clock),
+  2. two blind boxes opening, epic then legendary, with the shipped
+     shake / lid / item / spark keyframes frozen frame by frame,
+  3. the real collection gallery lighting up the two items just found.
+
+Only presentation-layer wrappers are added (canvas size, a container for
+the gallery, scale/position); no component CSS or product code is changed.
+
+Usage: python3 tools/render-preview.py [--out docs/preview.gif]
 Requires: macOS + Microsoft Edge + Pillow (pip install Pillow).
 """
 from __future__ import annotations
@@ -25,15 +34,23 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BUILD = ROOT / "build" / "preview-frames"
 EDGE = "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
+WIDTH, HEIGHT = 680, 560
 
-# Real values from DeepSeek Harness app.asar (light theme token table).
+# Static palette + both alias tables, copied verbatim from the host app.asar.
 THEME_CSS = """
 :root{
   --dsw-static-neutral-bluish-00:#fff;
+  --dsw-static-neutral-bluish-50:#f9fafb;
   --dsw-static-neutral-bluish-150:#e9ecf2;
+  --dsw-static-neutral-bluish-300:#cfd3d6;
   --dsw-static-neutral-bluish-700:#61666b;
+  --dsw-static-neutral-bluish-850:#2c2c2e;
+  --dsw-static-neutral-bluish-875:#232324;
+  --dsw-static-neutral-bluish-950:#151517;
   --dsw-static-neutral-bluish-1000:#0f1115;
   --dsw-static-green-500:#22c55e;
+}
+body[data-ds-light-theme]{
   --dsw-alias-bg-base:var(--dsw-static-neutral-bluish-00);
   --dsw-alias-bg-overlay:var(--dsw-static-neutral-bluish-150);
   --dsw-alias-bg-layer-1:var(--dsw-static-neutral-bluish-00);
@@ -45,15 +62,45 @@ THEME_CSS = """
   --dsw-alias-brand-primary:var(--dsw-static-neutral-bluish-1000);
   --dsw-alias-state-success-primary:var(--dsw-static-green-500);
 }
-html,body{margin:0;padding:0;height:100%;}
+body[data-ds-dark-theme]{
+  --dsw-alias-bg-base:var(--dsw-static-neutral-bluish-950);
+  --dsw-alias-bg-overlay:var(--dsw-static-neutral-bluish-700);
+  --dsw-alias-bg-layer-1:var(--dsw-static-neutral-bluish-875);
+  --dsw-alias-bg-layer-2:var(--dsw-static-neutral-bluish-850);
+  --dsw-alias-label-primary:var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-label-secondary:var(--dsw-static-neutral-bluish-300);
+  --dsw-alias-border-l1:#ffffff0f;
+  --dsw-alias-border-l2:#ffffff1f;
+  --dsw-alias-brand-primary:var(--dsw-static-neutral-bluish-50);
+  --dsw-alias-state-success-primary:var(--dsw-static-green-500);
+}
+html,body{margin:0;padding:0;height:100%;overflow:hidden;}
 body{
   background:var(--dsw-alias-bg-base);
   color:var(--dsw-alias-label-primary);
   font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
   -webkit-font-smoothing:antialiased;
 }
-#dockHost{position:absolute;left:0;right:0;bottom:26px;display:flex;justify-content:center;}
-#dockHost .dshPomo_dock{background:var(--dsw-alias-bg-overlay);border:1px solid var(--dsw-alias-border-l1);border-radius:12px;padding:4px 8px;}
+/* Presentation wrappers only: the plugin components inside are untouched. */
+#dockHost{position:absolute;left:0;right:0;bottom:30px;display:flex;justify-content:center;z-index:1;}
+#dockHost .dshPomo_dock{
+  background:var(--dsw-alias-bg-overlay);
+  border:1px solid var(--dsw-alias-border-l1);
+  border-radius:12px;padding:5px 9px;
+  box-shadow:0 10px 30px rgba(0,0,0,.28);
+}
+body.scene-dock #dockHost{top:50%;bottom:auto;transform:translateY(-50%) scale(1.55);}
+body.scene-box #dockHost{z-index:90;opacity:.6;}
+#galleryHost{display:none;}
+body.scene-gallery #galleryHost{
+  display:block;position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+  width:380px;box-sizing:border-box;padding:14px 16px;border-radius:16px;
+  background:var(--dsw-alias-bg-overlay);
+  border:1px solid var(--dsw-alias-border-l1);
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+body.scene-gallery #dockHost{bottom:26px;}
+body.scene-dockshot #dockHost{bottom:26px;}
 """
 
 MOCK_JS = r"""
@@ -71,6 +118,9 @@ MOCK_JS = r"""
     return out;
   }
 
+  window.__hookIndex = 0;
+  window.__stateOverrides = [];
+
   const ReactMock = {
     createElement(type, props) {
       const kids = flat(Array.prototype.slice.call(arguments, 2));
@@ -79,7 +129,11 @@ MOCK_JS = r"""
       }
       return { type: type, props: props || {}, children: kids };
     },
-    useState(initial) { return [initial, function () {}]; },
+    useState(initial) {
+      const i = window.__hookIndex++;
+      const o = window.__stateOverrides;
+      return [i < o.length && o[i] !== undefined ? o[i] : initial, function () {}];
+    },
     useRef(initial) { return { current: initial }; },
     useEffect() { return undefined; },
   };
@@ -125,7 +179,23 @@ MOCK_JS = r"""
     parent.appendChild(el);
   }
 
-  window.__dshRender = function (T, revealed, showDock, showBox) {
+  // Pull a real sub-tree out of the real component tree (no re-creation).
+  function findClass(v, name) {
+    if (v === null || v === undefined || typeof v !== 'object') return null;
+    if (Array.isArray(v)) {
+      for (const item of v) { const hit = findClass(item, name); if (hit) return hit; }
+      return null;
+    }
+    if (!v.props) return null;
+    if (String(v.props.className || '').split(' ').indexOf(name) >= 0) return v;
+    for (const child of v.children || []) {
+      const hit = findClass(child, name);
+      if (hit) return hit;
+    }
+    return null;
+  }
+
+  window.__dshRender = function (opts) {
     const plugin = window.__dshSpec.factory(window.__dshRequire);
     const captured = {};
     const ctx = {
@@ -149,45 +219,68 @@ MOCK_JS = r"""
       return s;
     }
     const noop = function () {};
-
-    // Real store shape, frozen at the instant one focus session just finished.
     const settings = { focus:25, shortBreak:5, longBreak:15, focusMs:1500000, shortBreakMs:300000, longBreakMs:900000 };
-    const dockSnapshot = {
-      phase: 'focus', status: 'idle', hidden: false, remaining: 1500000,
-      settings: settings,
-      stats: { total: 1, boxes: 1, owned: ['star'] },
-      pending: { id: 1, itemId: 'star', tier: 'legendary', newItem: true, openedAt: 0 },
-    };
-    const dockProps = {
-      t: t,
-      usePomodoro: function (selector) { return selector(dockSnapshot); },
-      togglePomodoro: noop, pausePomodoro: noop, resumePomodoro: noop,
-      skipPomodoro: noop, resetPomodoro: noop, setDuration: noop,
-      showPomodoro: noop, hidePomodoro: noop,
-    };
-    if (showDock) build(Dock(dockProps), document.getElementById('dockHost'), false);
 
-    const boxSnapshot = {
-      stats: { total: 1, boxes: 1, owned: ['star'] },
-      pending: dockSnapshot.pending,
-    };
-    const boxProps = {
-      t: t,
-      usePomodoro: function (selector) { return selector(boxSnapshot); },
-      devRevealed: revealed,
-      takePomodoro: noop, hidePomodoro: noop,
-    };
-    if (showBox) build(Box(boxProps), document.body, false);
+    function snapshot(withPending) {
+      return {
+        phase: 'focus', status: opts.running ? 'running' : 'idle', hidden: false,
+        remaining: opts.remaining, settings: settings,
+        stats: { total: opts.total, boxes: opts.boxes, owned: opts.owned },
+        pending: withPending ? {
+          id: opts.boxes, itemId: opts.item, tier: opts.tier,
+          newItem: true, openedAt: 0,
+        } : null,
+      };
+    }
+    function dockProps(snap) {
+      return {
+        t: t, usePomodoro: function (selector) { return selector(snap); },
+        togglePomodoro: noop, pausePomodoro: noop, resumePomodoro: noop,
+        skipPomodoro: noop, resetPomodoro: noop, setDuration: noop,
+        showPomodoro: noop, hidePomodoro: noop,
+      };
+    }
 
-    // Freeze every *shipped* CSS animation at the requested time.
-    document.body.offsetHeight;
-    const globalNames = ['dshPomoFade', 'dshPomoCard', 'dshPomoHalo', 'dshPomoBurst'];
-    const local = revealed ? T - 680 : T;
-    document.getAnimations().forEach(function (anim) {
-      anim.pause();
-      const name = anim.animationName || '';
-      anim.currentTime = Math.max(0, globalNames.indexOf(name) >= 0 ? T : local);
-    });
+    const dockHost = document.getElementById('dockHost');
+    if (opts.scene === 'gallery') {
+      // Open the real settings panel, then place its real gallery sub-tree.
+      window.__hookIndex = 0;
+      window.__stateOverrides = [true, opts.selected || null];
+      const panelTree = Dock(dockProps(snapshot(false)));
+      build(findClass(panelTree, 'dshPomo_gallery'), document.getElementById('galleryHost'), false);
+      window.__hookIndex = 0;
+      window.__stateOverrides = [false, null];
+      build(Dock(dockProps(snapshot(false))), dockHost, false);
+    } else {
+      window.__hookIndex = 0;
+      window.__stateOverrides = [false, null];
+      // While a box is open, the real dock shows its pending "!" badge.
+      build(Dock(dockProps(snapshot(opts.scene === 'box'))), dockHost, false);
+    }
+
+    if (opts.scene === 'box') {
+      window.__hookIndex = 0;
+      window.__stateOverrides = [];
+      const boxSnap = snapshot(true);
+      build(Box({
+        t: t,
+        usePomodoro: function (selector) { return selector(boxSnap); },
+        devRevealed: opts.t >= 680,
+        takePomodoro: noop, hidePomodoro: noop,
+      }), document.body, false);
+
+      // Freeze every shipped keyframe at the requested time. Card / scrim /
+      // halo / burst start when the card mounts; the rest restart at the
+      // 680ms stage switch, exactly as the real component does.
+      document.body.offsetHeight;
+      const globalNames = ['dshPomoFade', 'dshPomoCard', 'dshPomoHalo', 'dshPomoBurst'];
+      const local = opts.t >= 680 ? opts.t - 680 : opts.t;
+      document.getAnimations().forEach(function (anim) {
+        anim.pause();
+        const name = anim.animationName || '';
+        anim.currentTime = Math.max(0, globalNames.indexOf(name) >= 0 ? opts.t : local);
+      });
+    }
     document.documentElement.setAttribute('data-ready', '1');
   };
 })();
@@ -200,16 +293,30 @@ FRAME_TEMPLATE = """<!doctype html>
 <script>window.__dshLocale = __LOCALE__;</script>
 <script>__MOCK__</script>
 <script>__CLIENT__</script>
-</head><body><div id="dockHost"></div>
+</head><body><div id="galleryHost"></div><div id="dockHost"></div>
 <script>
 (function () {
-  const params = new URLSearchParams(location.hash.slice(1));
-  const T = Math.max(0, Number(params.get('t') || 0));
+  const p = new URLSearchParams(location.hash.slice(1));
+  const opts = {
+    scene: p.get('scene') || 'box',
+    theme: p.get('theme') || 'dark',
+    t: Number(p.get('t') || 0),
+    item: p.get('item') || 'star',
+    tier: p.get('tier') || 'legendary',
+    owned: (p.get('owned') || '').split(',').filter(Boolean),
+    selected: p.get('selected') || null,
+    remaining: Number(p.get('remaining') || 1500000),
+    boxes: Number(p.get('boxes') || 1),
+    total: Number(p.get('total') || 1),
+    running: p.get('running') === '1',
+  };
+  document.body.className = 'scene-' + opts.scene;
+  document.body.setAttribute(opts.theme === 'light' ? 'data-ds-light-theme' : 'data-ds-dark-theme', '');
   try {
-    window.__dshRender(T, T >= 680, params.get('dock') === '1', params.get('box') !== '0');
+    window.__dshRender(opts);
   } catch (error) {
     const pre = document.createElement('pre');
-    pre.style.cssText = 'color:#c00;font:12px monospace;white-space:pre-wrap;padding:8px';
+    pre.style.cssText = 'color:#ff8080;font:12px monospace;white-space:pre-wrap;padding:8px;position:absolute;z-index:999';
     pre.textContent = (error && error.stack) || String(error);
     document.body.appendChild(pre);
   }
@@ -222,7 +329,6 @@ FRAME_TEMPLATE = """<!doctype html>
 def build_html() -> pathlib.Path:
     client = (ROOT / "client.js").read_text(encoding="utf-8")
     locale = (ROOT / "locale" / "zh.json").read_text(encoding="utf-8")
-    # A literal </script> inside an inline script would end the element early.
     safe_client = client.replace("</script", "<\\/script")
     doc = (FRAME_TEMPLATE
            .replace("__THEME__", THEME_CSS)
@@ -242,8 +348,7 @@ def shoot(args) -> pathlib.Path:
     cmd = [
         EDGE, "--headless=new", "--no-sandbox", "--disable-gpu",
         "--disable-dev-shm-usage", "--disable-software-rasterizer",
-        "--no-first-run",
-        "--no-default-browser-check", "--disable-extensions",
+        "--no-first-run", "--no-default-browser-check", "--disable-extensions",
         "--hide-scrollbars", "--force-device-scale-factor=1",
         "--window-size=%d,%d" % (width, height), "--virtual-time-budget=1200",
         "--user-data-dir=" + str(profile),
@@ -267,12 +372,36 @@ def crop_to_content(im, background=(255, 255, 255), padding=14):
                     min(im.width, box[2] + padding), min(im.height, box[3] + padding)))
 
 
+def q(**kwargs) -> str:
+    return "&".join("%s=%s" % (key, value) for key, value in kwargs.items())
+
+
+def make_shots():
+    shots = []
+    # Shot 1: the composer dock counting down (clock + ring both change).
+    for i in range(6):
+        shots.append(q(scene="dock", theme="dark", running=1,
+                       remaining=1500000 - i * 150000, owned="", boxes=0, total=0))
+    # Shot 2: two blind boxes, epic then legendary.
+    for item, tier, owned, boxes in [("crystal", "epic", "crystal", 1),
+                                     ("star", "legendary", "crystal,star", 2)]:
+        for i in range(12):
+            shots.append(q(scene="box", theme="dark", t=200 + i * 170,
+                           item=item, tier=tier, owned=owned, boxes=boxes, total=boxes))
+    # Shot 3: the real gallery lighting up the two finds.
+    steps = ["", "crystal", "crystal,star", "crystal,star",
+             "crystal,star", "crystal,star", "crystal,star", "crystal,star"]
+    for owned in steps:
+        selected = "star" if "star" in owned else ("crystal" if owned else "")
+        shots.append(q(scene="gallery", theme="dark", owned=owned,
+                       selected=selected, boxes=2, total=2))
+    return shots
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--frames", type=int, default=27)
     ap.add_argument("--step", type=int, default=100, help="ms between frames")
-    ap.add_argument("--start", type=int, default=60, help="ms of the first frame")
-    ap.add_argument("--scale", type=float, default=0.9)
+    ap.add_argument("--scale", type=float, default=0.8)
     ap.add_argument("--out", default=str(ROOT / "docs" / "preview.gif"))
     ap.add_argument("--dock-out", default=str(ROOT / "docs" / "dock.png"))
     ap.add_argument("--workers", type=int, default=6)
@@ -288,40 +417,39 @@ def main() -> int:
     if out_dir.exists():
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True)
-    times = [args.start + i * args.step for i in range(args.frames)]
-    jobs = [(i, "t=%d" % t, frame_path, out_dir, 460, 500) for i, t in enumerate(times)]
-    jobs.append((999, "t=0&dock=1&box=0", frame_path, out_dir, 460, 500))
+
+    shots = make_shots()
+    jobs = [(i, query, frame_path, out_dir, WIDTH, HEIGHT) for i, query in enumerate(shots)]
+    # Static dock.png stays on the light theme, as in the README install section.
+    dock_query = q(scene="dockshot", theme="light", running=0, remaining=1500000,
+                   owned="", boxes=0, total=0)
+    jobs.append((999, dock_query, frame_path, out_dir, 460, 500))
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
         list(pool.map(shoot, jobs))
 
     frames = []
-    for i in range(args.frames):
+    for i in range(len(shots)):
         im = Image.open(out_dir / ("f_%03d.png" % i)).convert("RGB")
-        im = im.crop((46, 30, 414, 478))
         if args.scale != 1.0:
             im = im.resize((round(im.width * args.scale), round(im.height * args.scale)), Image.LANCZOS)
         frames.append(im)
 
-    dock = Image.open(out_dir / "f_999.png").convert("RGB")
-    dock = crop_to_content(dock)
+    dock = crop_to_content(Image.open(out_dir / "f_999.png").convert("RGB"))
     dock_path = pathlib.Path(args.dock_out)
     dock_path.parent.mkdir(parents=True, exist_ok=True)
     dock.save(dock_path)
     print("wrote %s (%dx%d)" % (dock_path, dock.width, dock.height))
 
     # One shared palette keeps the GIF small and avoids colour flicker.
-    palette_source = frames[len(frames) // 2].copy()
-    palette = palette_source.quantize(colors=128, method=Image.Quantize.MEDIANCUT)
+    palette = frames[len(frames) // 2].copy().quantize(colors=128, method=Image.Quantize.MEDIANCUT)
     quant = [f.quantize(palette=palette, dither=Image.Dither.NONE) for f in frames]
-
     durations = [args.step] * len(quant)
-    durations[-1] = 900
+    durations[-1] = 1000
     out = pathlib.Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    quant[0].save(
-        out, save_all=True, append_images=quant[1:],
-        duration=durations, loop=0, optimize=True, disposal=2,
-    )
+    quant[0].save(out, save_all=True, append_images=quant[1:],
+                  duration=durations, loop=0, optimize=True, disposal=2)
+
     # Edge creates a user-data-dir per frame; keep only the PNGs locally.
     for profile in out_dir.glob("edge_*"):
         if profile.is_dir():
