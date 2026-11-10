@@ -318,7 +318,7 @@ window.__ModuleLoader__.load({
       'opacity:0;animation:dshPomoHalo 1.4s ease-out .55s both;}',
       '.dshPomo_box{position:relative;width:92px;height:92px;animation:dshPomoShake .58s ease-in-out both;}',
       '.dshPomo_boxOpened .dshPomo_box{animation:dshPomoShake .58s ease-in-out both,',
-      'dshPomoVanish .22s ease-in .58s both;}',
+      'dshPomoVanish .26s ease-in both;}',
       '.dshPomo_lid{position:absolute;left:50%;top:6px;width:84px;height:24px;margin-left:-42px;',
       'border-radius:9px 9px 5px 5px;background:var(--dsh-pomo-accent);',
       'box-shadow:inset 0 -3px 0 rgba(0,0,0,.16),inset 0 2px 0 rgba(255,255,255,.28);}',
@@ -332,10 +332,10 @@ window.__ModuleLoader__.load({
       'margin-left:-6px;background:rgba(255,255,255,.42);}',
       '.dshPomo_base::after{content:"";position:absolute;left:6px;right:6px;top:22px;height:12px;',
       'border-radius:4px;background:rgba(255,255,255,.42);}',
-      '.dshPomo_boxOpened .dshPomo_lid{animation:dshPomoLid .44s cubic-bezier(.25,.9,.35,1.15) .58s both;}',
+      '.dshPomo_boxOpened .dshPomo_lid{animation:dshPomoLid .44s cubic-bezier(.25,.9,.35,1.15) both;}',
       '.dshPomo_emoji{position:absolute;font-size:54px;line-height:1;opacity:0;',
       'filter:drop-shadow(0 8px 14px rgba(0,0,0,.2));',
-      'animation:dshPomoItem .56s cubic-bezier(.2,.9,.3,1.5) .68s both;}',
+      'animation:dshPomoItem .56s cubic-bezier(.2,.9,.3,1.5) both;}',
       '.dshPomo_spark{position:absolute;left:50%;top:50%;font-size:18px;line-height:1;opacity:0;',
       'animation:dshPomoSpark 1s ease-out var(--dsh-pomo-delay,0s) both;}',
       '.dshPomo_spark:nth-child(2n){font-size:13px;}',
@@ -348,6 +348,15 @@ window.__ModuleLoader__.load({
       'border:1px solid color-mix(in srgb,var(--dsh-pomo-accent) 34%,transparent);}',
       '.dshPomo_name{margin:10px 0 0;font-size:19px;font-weight:700;line-height:26px;}',
       '.dshPomo_desc{margin:5px 0 0;font-size:13px;line-height:19px;color:var(--dsw-alias-label-secondary);}',
+      /* Both states occupy the same grid cell, so the card never changes
+         height when the reveal stage switches. Only visibility cross-fades. */
+      '.dshPomo_reveal{display:grid;align-items:start;}',
+      '.dshPomo_reveal>*{grid-area:1/1;}',
+      '.dshPomo_waiting{margin:0;font-size:13px;line-height:19px;color:var(--dsw-alias-label-secondary);',
+      'transition:opacity .22s ease;}',
+      '.dshPomo_waitingGone{opacity:0;visibility:hidden;}',
+      '.dshPomo_body{transition:opacity .3s ease;}',
+      '.dshPomo_bodyPending{opacity:0;visibility:hidden;}',
       '.dshPomo_meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:12px 0 0;}',
       '.dshPomo_tag{padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;',
       'color:var(--dsw-alias-label-secondary);background:var(--dsw-alias-bg-layer-2);}',
@@ -383,7 +392,8 @@ window.__ModuleLoader__.load({
       '25%{opacity:1}100%{opacity:0;transform:translate(var(--dsh-pomo-x,0),var(--dsh-pomo-y,-58px)) scale(1.05)}}',
       '@media (prefers-reduced-motion:reduce){.dshPomo_box,.dshPomo_boxOpened .dshPomo_box,',
       '.dshPomo_boxOpened .dshPomo_lid,.dshPomo_emoji,.dshPomo_halo,.dshPomo_burst,.dshPomo_spark,',
-      '.dshPomo_card,.dshPomo_scrim{animation-duration:1ms!important;animation-delay:0ms!important;}}',
+      '.dshPomo_card,.dshPomo_scrim{animation-duration:1ms!important;animation-delay:0ms!important;',
+      '.dshPomo_body,.dshPomo_waiting{transition-duration:0ms!important;}}',
     ].join('');
 
     function PomodoroStyles() {
@@ -1048,14 +1058,19 @@ window.__ModuleLoader__.load({
             className: 'dshPomo_spark',
             'aria-hidden': true,
             style: {
-              '--dsh-pomo-delay': (0.72 + index * 0.05) + 's',
+              '--dsh-pomo-delay': (0.06 + index * 0.05) + 's',
               '--dsh-pomo-x': Math.round(Math.cos((index / SPARKS.length) * Math.PI * 2) * 66) + 'px',
               '--dsh-pomo-y': Math.round(Math.sin((index / SPARKS.length) * Math.PI * 2) * 54 - 10) + 'px',
             },
           }, spark))
           : null),
-      revealed
-        ? h('div', { className: 'dshPomo_body' },
+      h('div', { className: 'dshPomo_reveal' },
+        h('p', { className: 'dshPomo_waiting' + (revealed ? ' dshPomo_waitingGone' : '') },
+          t('box.waiting')),
+        h('div', {
+          className: 'dshPomo_body' + (revealed ? '' : ' dshPomo_bodyPending'),
+          'aria-hidden': revealed ? undefined : 'true',
+        },
           h('span', { className: 'dshPomo_tier' }, t('tier.' + pending.tier)),
           h('h2', { className: 'dshPomo_name', id: 'dshPomoBoxName' }, t('item.' + item.id + '.name')),
           h('p', { className: 'dshPomo_desc' }, t('item.' + item.id + '.description')),
@@ -1082,8 +1097,7 @@ window.__ModuleLoader__.load({
                 props.hidePomodoro();
               },
             }, t('action.archive'))),
-          h('p', { className: 'dshPomo_foot' }, t('box.subtitle')))
-        : h('p', { className: 'dshPomo_desc' }, t('box.waiting'))));
+          h('p', { className: 'dshPomo_foot' }, t('box.subtitle'))))));
     }
 
     /* ── client entry ────────────────────────────────────────────────── */

@@ -2,8 +2,10 @@
 
 ## Unreleased
 
-- README 换成深色主题的三段分镜动图：输入框下方的计时条 → 连开两个不同稀有度的盲盒（史诗 / 传说）→ 图鉴点亮刚开出的藏品；另附输入框下方 dock 的浅色截图。两张图都由 `tools/render-preview.py` 直接执行 `client.js`，渲染真实组件（`PomodoroDock` / `PomodoroBox` / `CollectionGrid`）、真实 CSS keyframes、真实词典和 Harness 主题 token，不是手绘示意图。
-- `tools/render-preview.py` 改为按场景参数化（dock / box / gallery），用 `body[data-ds-dark-theme]` 的 app.asar 真实色板；构建产物 `build/` 加入 `.gitignore`，脚本会清理浏览器临时目录。
+- 修复开箱卡片的高度跳变：`client.js` 把「盲盒正在打开…」和结果区放进同一个 grid 单元（`.dshPomo_reveal`），两态只切换 `visibility` / `opacity`，卡片从挂载起高度恒定；`prefers-reduced-motion` 下过渡也归零。
+- 理顺开箱时序：去掉 `dshPomoVanish` / `dshPomoLid` 的 0.58s 延迟和 `dshPomoItem` 的 0.68s 延迟，火花延迟从 0.72s 降到 0.06s。切到结果时礼盒立刻开盖、藏品立刻弹出，不再有「结果文字已出现、礼盒又摇一次」的空档。
+- README 动图回到浅色主题（`body[data-ds-light-theme]`），保留三段分镜构图；深色版宝石与礼盒对比过强、整体发闷。
+- `tools/render-preview.py`：GIF 调色板由「单帧 128 色」改为「全部帧拼图采样 256 色」，修复 💎 的蓝色被量化成灰白；浏览器 profile 改为按 worker 线程复用系统临时目录，工作区只保留 PNG，并支持 `--reassemble` 用已有帧重调色板。构建产物 `build/` 已加入 `.gitignore`。
 
 ## 1.2.2
 

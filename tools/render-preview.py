@@ -5,8 +5,7 @@ Nothing here is hand-drawn. The page loads this repository's client.js,
 executes its real factory with a tiny React/DOM shim, and renders the real
 PomodoroDock, PomodoroBox and CollectionGrid components with the real CSS,
 real locale strings, real SVG icons and the real Harness theme tokens
-extracted from app.asar (light: body[data-ds-light-theme], dark:
-body[data-ds-dark-theme]).
+extracted from app.asar (body[data-ds-light-theme]).
 
 The GIF is a three-shot cut, all from those components:
 
@@ -27,9 +26,10 @@ import argparse
 import concurrent.futures
 import os
 import pathlib
-import shutil
 import subprocess
 import sys
+import tempfile
+import threading
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BUILD = ROOT / "build" / "preview-frames"
@@ -87,7 +87,7 @@ body{
   background:var(--dsw-alias-bg-overlay);
   border:1px solid var(--dsw-alias-border-l1);
   border-radius:12px;padding:5px 9px;
-  box-shadow:0 10px 30px rgba(0,0,0,.28);
+  box-shadow:0 10px 30px rgba(0,0,0,.16);
 }
 body.scene-dock #dockHost{top:50%;bottom:auto;transform:translateY(-50%) scale(1.55);}
 body.scene-box #dockHost{z-index:90;opacity:.6;}
@@ -97,7 +97,7 @@ body.scene-gallery #galleryHost{
   width:380px;box-sizing:border-box;padding:14px 16px;border-radius:16px;
   background:var(--dsw-alias-bg-overlay);
   border:1px solid var(--dsw-alias-border-l1);
-  box-shadow:0 20px 60px rgba(0,0,0,.45);
+  box-shadow:0 20px 60px rgba(0,0,0,.20);
 }
 body.scene-gallery #dockHost{bottom:26px;}
 body.scene-dockshot #dockHost{bottom:26px;}
@@ -269,11 +269,12 @@ MOCK_JS = r"""
         takePomodoro: noop, hidePomodoro: noop,
       }), document.body, false);
 
-      // Freeze every shipped keyframe at the requested time. Card / scrim /
-      // halo / burst start when the card mounts; the rest restart at the
-      // 680ms stage switch, exactly as the real component does.
+      // Freeze every shipped animation at the requested time. Scrim / card /
+      // halo / burst / shake start when the card mounts; lid / vanish / item
+      // / sparks start at the 680ms stage switch, as in the real component.
       document.body.offsetHeight;
-      const globalNames = ['dshPomoFade', 'dshPomoCard', 'dshPomoHalo', 'dshPomoBurst'];
+      const globalNames = ['dshPomoFade', 'dshPomoCard', 'dshPomoHalo',
+                           'dshPomoBurst', 'dshPomoShake'];
       const local = opts.t >= 680 ? opts.t - 680 : opts.t;
       document.getAnimations().forEach(function (anim) {
         anim.pause();
@@ -299,7 +300,7 @@ FRAME_TEMPLATE = """<!doctype html>
   const p = new URLSearchParams(location.hash.slice(1));
   const opts = {
     scene: p.get('scene') || 'box',
-    theme: p.get('theme') || 'dark',
+    theme: p.get('theme') || 'light',
     t: Number(p.get('t') || 0),
     item: p.get('item') || 'star',
     tier: p.get('tier') || 'legendary',
@@ -344,7 +345,11 @@ def build_html() -> pathlib.Path:
 def shoot(args) -> pathlib.Path:
     index, query, frame_path, out_dir, width, height = args
     out = out_dir / ("f_%03d.png" % index)
-    profile = out_dir / ("edge_%03d" % index)
+    # One profile per worker thread, reused across runs: a thread never runs
+    # two Edge processes at once, so there is no lock contention and no
+    # per-frame profile junk left in the repository.
+    profile = pathlib.Path(tempfile.gettempdir()) / (
+        "dsh_pomo_edge_" + threading.current_thread().name.replace(" ", "_"))
     cmd = [
         EDGE, "--headless=new", "--no-sandbox", "--disable-gpu",
         "--disable-dev-shm-usage", "--disable-software-rasterizer",
@@ -380,20 +385,20 @@ def make_shots():
     shots = []
     # Shot 1: the composer dock counting down (clock + ring both change).
     for i in range(6):
-        shots.append(q(scene="dock", theme="dark", running=1,
+        shots.append(q(scene="dock", theme="light", running=1,
                        remaining=1500000 - i * 150000, owned="", boxes=0, total=0))
     # Shot 2: two blind boxes, epic then legendary.
     for item, tier, owned, boxes in [("crystal", "epic", "crystal", 1),
                                      ("star", "legendary", "crystal,star", 2)]:
         for i in range(12):
-            shots.append(q(scene="box", theme="dark", t=200 + i * 170,
+            shots.append(q(scene="box", theme="light", t=200 + i * 170,
                            item=item, tier=tier, owned=owned, boxes=boxes, total=boxes))
     # Shot 3: the real gallery lighting up the two finds.
     steps = ["", "crystal", "crystal,star", "crystal,star",
              "crystal,star", "crystal,star", "crystal,star", "crystal,star"]
     for owned in steps:
         selected = "star" if "star" in owned else ("crystal" if owned else "")
-        shots.append(q(scene="gallery", theme="dark", owned=owned,
+        shots.append(q(scene="gallery", theme="light", owned=owned,
                        selected=selected, boxes=2, total=2))
     return shots
 
@@ -405,6 +410,8 @@ def main() -> int:
     ap.add_argument("--out", default=str(ROOT / "docs" / "preview.gif"))
     ap.add_argument("--dock-out", default=str(ROOT / "docs" / "dock.png"))
     ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--reassemble", action="store_true",
+                    help="reuse existing PNG frames; only redo GIF quantisation")
     args = ap.parse_args()
 
     if not os.path.exists(EDGE):
@@ -414,18 +421,25 @@ def main() -> int:
 
     frame_path = build_html()
     out_dir = BUILD / "png"
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
-    out_dir.mkdir(parents=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    if not args.reassemble:
+        for stale in out_dir.glob("f_*.png"):
+            stale.unlink()
 
     shots = make_shots()
-    jobs = [(i, query, frame_path, out_dir, WIDTH, HEIGHT) for i, query in enumerate(shots)]
-    # Static dock.png stays on the light theme, as in the README install section.
-    dock_query = q(scene="dockshot", theme="light", running=0, remaining=1500000,
-                   owned="", boxes=0, total=0)
-    jobs.append((999, dock_query, frame_path, out_dir, 460, 500))
-    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
-        list(pool.map(shoot, jobs))
+    missing = [i for i in range(len(shots))
+               if not (out_dir / ("f_%03d.png" % i)).exists()]
+    if args.reassemble and (missing or not (out_dir / "f_999.png").exists()):
+        print("reassemble needs all frames, missing: %s" % missing, file=sys.stderr)
+        return 2
+    if not args.reassemble:
+        jobs = [(i, query, frame_path, out_dir, WIDTH, HEIGHT) for i, query in enumerate(shots)]
+        # The static dock.png uses the same light theme as the GIF.
+        dock_query = q(scene="dockshot", theme="light", running=0, remaining=1500000,
+                       owned="", boxes=0, total=0)
+        jobs.append((999, dock_query, frame_path, out_dir, 460, 500))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
+            list(pool.map(shoot, jobs))
 
     frames = []
     for i in range(len(shots)):
@@ -440,8 +454,16 @@ def main() -> int:
     dock.save(dock_path)
     print("wrote %s (%dx%d)" % (dock_path, dock.width, dock.height))
 
-    # One shared palette keeps the GIF small and avoids colour flicker.
-    palette = frames[len(frames) // 2].copy().quantize(colors=128, method=Image.Quantize.MEDIANCUT)
+    # One shared palette avoids colour flicker, but sampling it from a single
+    # frame at 128 colours dropped rare accents: the blue gem went grey while
+    # the gold star survived. Sample a montage of every frame at 256 colours.
+    thumb_w, thumb_h, cols = 128, 105, 6
+    rows = (len(frames) + cols - 1) // cols
+    montage = Image.new("RGB", (thumb_w * cols, thumb_h * rows))
+    for k, frame in enumerate(frames):
+        montage.paste(frame.resize((thumb_w, thumb_h), Image.LANCZOS),
+                      ((k % cols) * thumb_w, (k // cols) * thumb_h))
+    palette = montage.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
     quant = [f.quantize(palette=palette, dither=Image.Dither.NONE) for f in frames]
     durations = [args.step] * len(quant)
     durations[-1] = 1000
@@ -449,11 +471,6 @@ def main() -> int:
     out.parent.mkdir(parents=True, exist_ok=True)
     quant[0].save(out, save_all=True, append_images=quant[1:],
                   duration=durations, loop=0, optimize=True, disposal=2)
-
-    # Edge creates a user-data-dir per frame; keep only the PNGs locally.
-    for profile in out_dir.glob("edge_*"):
-        if profile.is_dir():
-            shutil.rmtree(profile, ignore_errors=True)
 
     print("wrote %s (%d frames, %dx%d, %d bytes)" % (
         out, len(quant), quant[0].width, quant[0].height, out.stat().st_size))

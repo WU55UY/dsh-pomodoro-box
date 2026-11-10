@@ -7,15 +7,15 @@
 ![MIT](https://img.shields.io/badge/license-MIT-green)
 ![DSH](https://img.shields.io/badge/DeepSeek%20Harness-Web%20UI-blue)
 
-![深色主题演示：输入框下方的番茄钟 → 连开两个盲盒（史诗 / 传说）→ 图鉴点亮](docs/preview.gif)
+![浅色主题演示：输入框下方的番茄钟 → 连开两个盲盒（史诗 / 传说）→ 图鉴点亮](docs/preview.gif)
 
-> 上面不是示意图：[`tools/render-preview.py`](tools/render-preview.py) 直接执行本仓库的 `client.js`，渲染真实的 `PomodoroDock` / `PomodoroBox` / `CollectionGrid` 组件，用真实 CSS keyframes、真实中文词典和 Harness 深色主题 token 逐帧截图合成。三段分镜：计时 → 连开两个不同稀有度的盲盒 → 图鉴点亮刚开出的两件藏品。
+> 上面不是示意图：[`tools/render-preview.py`](tools/render-preview.py) 直接执行本仓库的 `client.js`，渲染真实的 `PomodoroDock` / `PomodoroBox` / `CollectionGrid` 组件，用真实 CSS keyframes、真实中文词典和 Harness 浅色主题 token 逐帧截图合成。三段分镜：计时 → 连开两个不同稀有度的盲盒 → 图鉴点亮刚开出的两件藏品。
 
 ## 功能
 
 - **番茄钟**：专注 15 / 25 / 45 / 60 分钟，短休息与长休息 3 / 5 / 10 / 15 分钟；开始、暂停、继续、跳过、重置。
 - **长休息节奏**：每完成 4 个专注段自动进入一次长休息（时长可配）。
-- **盲盒**：只有真正走完的专注段才会发盒；跳过不会。开箱有摇晃、开盖、物件弹出的动画，并适配 `prefers-reduced-motion`。
+- **盲盒**：只有真正走完的专注段才会发盒；跳过不会。开箱有摇晃、开盖、物件弹出的动画，并适配 `prefers-reduced-motion`；等待与结果两态共用同一网格单元，卡片高度恒定，切换只做淡入。
 - **15 件藏品 / 4 个稀有度**：普通 60%、稀有 25%、史诗 12%、传说 3%；档位内等概率。每次独立抽取，重复是正常的。
 - **图鉴**：设置面板里的 5×3 网格，已收集的亮起并按稀有度着色；点格子查看名称、稀有度和描述，未发现的显示为锁定；集齐 15 件后显示「已集齐」，开箱卡也会带上「图鉴已集齐」。
 - **双语与主题**：中英文词典；颜色、圆角、阴影全部走 Harness Theme token，跟随明暗主题。
@@ -171,7 +171,7 @@ Pomodoro Blind Box is a DeepSeek Harness Web UI plugin that puts a focus timer u
 - **Install**: `dsh plugin --profile desktop add dsh-pomodoro-box` (npm), or attach the prebuilt tarball from the latest GitHub release if you would rather not go through npm; the market index below and installing the cloned folder as a bundle both work too.
 - **Data**: everything lives in `localStorage` under `dsh.pomodoro-box.v1`; the plugin makes no network requests.
 - **Dev**: no build step. `client.js` is loaded as a Client module via `window.__ModuleLoader__`; keep the runtime `EN`/`ZH` dictionaries in sync with `locale/*.json`.
-- **Preview**: the GIF above is a three-shot cut rendered frame-by-frame from the shipped `client.js` by `tools/render-preview.py` — the composer dock, two blind boxes (epic / legendary), then the collection gallery lighting up. Real components, real CSS keyframes, real locale strings and dark-theme tokens; not a mockup.
+- **Preview**: the GIF above is a three-shot cut rendered frame-by-frame from the shipped `client.js` by `tools/render-preview.py` — the composer dock, two blind boxes (epic / legendary), then the collection gallery lighting up. Real components, real CSS keyframes, real locale strings and light-theme tokens; not a mockup.
 
 ## License
 
