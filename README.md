@@ -77,7 +77,7 @@ https://cdn.jsdelivr.net/gh/WU55UY/dsh-pomodoro-box@main/market/index.json
 
 > jsDelivr 会缓存分支引用（`@main`），索引改动最长可能 12 小时后才生效；要立刻生效或想要不可变 URL，把 `@main` 换成具体提交哈希即可。
 >
-> format-1 的 `source` 只支持 `npm` 和 `git` 两种，**没有 tarball 类型**，所以索引里走「git + 钉提交」，22 KB 的 tarball 快路径放在 awesome-dsh-plugin 的条目里。
+> format-1 的 `source` 只支持 `npm` 和 `git` 两种，**没有 tarball 类型**，所以索引里走「git + 钉提交」；想要 tarball 快路径就用上面安装方式 B 的 GitHub Release 地址（约 25 KB），不要依赖第三方列表里钉死版本的链接——它们不会跟着发版更新。
 
 改完索引后建议用官方校验器自检：
 
