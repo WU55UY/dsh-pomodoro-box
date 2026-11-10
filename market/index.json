@@ -52,12 +52,12 @@
         ]
       },
       "dist-tags": {
-        "latest": "1.2.2"
+        "latest": "1.2.3"
       },
       "versions": [
         {
-          "version": "1.2.2",
-          "publishTimestamp": 1794214271,
+          "version": "1.2.3",
+          "publishTimestamp": 1794297639,
           "source": {
             "type": "npm"
           },

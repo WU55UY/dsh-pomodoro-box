@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.2.3
 
+- 发布到 npm 与 GitHub Release `v1.2.3`；README 的 tarball / git tag 安装示例、插件市场索引同步到 1.2.3。
 - 修复开箱卡片的高度跳变：`client.js` 把「盲盒正在打开…」和结果区放进同一个 grid 单元（`.dshPomo_reveal`），两态只切换 `visibility` / `opacity`，卡片从挂载起高度恒定；`prefers-reduced-motion` 下过渡也归零。
 - 理顺开箱时序：去掉 `dshPomoVanish` / `dshPomoLid` 的 0.58s 延迟和 `dshPomoItem` 的 0.68s 延迟，火花延迟从 0.72s 降到 0.06s。切到结果时礼盒立刻开盖、藏品立刻弹出，不再有「结果文字已出现、礼盒又摇一次」的空档。
 - README 动图回到浅色主题（`body[data-ds-light-theme]`），保留三段分镜构图；深色版宝石与礼盒对比过强、整体发闷。

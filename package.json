@@ -1,6 +1,6 @@
 {
   "name": "dsh-pomodoro-box",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A pomodoro timer for the DeepSeek Harness composer dock that opens a collectible blind box after every focus session.",
   "type": "module",
   "license": "MIT",

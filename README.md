@@ -31,10 +31,10 @@
 dsh plugin --profile desktop add dsh-pomodoro-box
 ```
 
-**B. 预打包 tarball（不经过 npm，23 KB）**
+**B. 预打包 tarball（不经过 npm，25 KB）**
 
 ```bash
-dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.2/dsh-pomodoro-box-1.2.2.tgz
+dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/releases/download/v1.2.3/dsh-pomodoro-box-1.2.3.tgz
 ```
 
 `desktop` 换成你实际使用的 profile 名（Web 版通常是 `web`）。这两种方式都会把 `dsh-pomodoro-box` 写进该 profile 的 `dsh.profile.bundles`，重启一次 Harness 生效。
@@ -42,7 +42,7 @@ dsh plugin --profile desktop add https://github.com/WU55UY/dsh-pomodoro-box/rele
 **C. 钉在 tag 上的 git 源**
 
 ```bash
-dsh plugin --profile desktop add "git+https://github.com/WU55UY/dsh-pomodoro-box.git#v1.2.2"
+dsh plugin --profile desktop add "git+https://github.com/WU55UY/dsh-pomodoro-box.git#v1.2.3"
 ```
 
 **D. 插件市场**
